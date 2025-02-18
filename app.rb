@@ -15,17 +15,40 @@ post('/cards')
 
 end
 
-
-post('/login')
-
+get ('/start') do
+    slim:start
 end
 
+get ('/login') do
+    slim:forms
+end
+
+post ('/loggedin') do
+    if params[:firstname] == "" || params[:lastname] == ""
+        session[:name] = nil
+    else
+        session[:name] = params[:firstname] + " " + params[:lastname]
+    end
+    session[:type] = "logged in"
+    redirect('/result')
+end
+
+post ('/registered') do
+    if params[:firstname] == "" || params[:lastname] == ""
+        session[:name] = nil
+    else
+        session[:name] = params[:firstname] + " " + params[:lastname]
+    end
+    session[:type] = "rigestered"
+    redirect('/result')
+end
+
+get ('/result') do
+    slim:result
+end
 
 post('/profile')
 
 end
 
 
-post('/start')
-
-end
