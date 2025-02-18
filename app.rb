@@ -2,7 +2,10 @@ require 'sinatra'
 require 'slim'
 require 'sqlite3'
 require 'sinatra/reloader'
-require 'becrypt'
+require 'csv'
+require 'bcrypt'
+
+enable:sessions
 
 def connect_to_db(path)
     db = SQLite3::Database.new(path)
@@ -10,10 +13,24 @@ def connect_to_db(path)
     return db
 end
 
+def register_user()
 
+end
+
+def login_user(firstname, lastname)
+    if firstname == "" || lastname == ""
+        session[:name] = nil
+    else
+        session[:name] = firstname + " " + lastname
+    end
+    return session[:name]
+end
+
+=begin
 post('/cards')
 
 end
+=end
 
 get ('/start') do
     slim:start
@@ -24,13 +41,11 @@ get ('/login') do
 end
 
 post ('/loggedin') do
-    if params[:firstname] == "" || params[:lastname] == ""
-        session[:name] = nil
-    else
-        session[:name] = params[:firstname] + " " + params[:lastname]
-    end
+    firstname = params[:firstname]
+    lastname = params[:lastname]
+    login_user(firstname, lastname)
     session[:type] = "logged in"
-    redirect('/result')
+    redirect('/result') 
 end
 
 post ('/registered') do
@@ -39,7 +54,7 @@ post ('/registered') do
     else
         session[:name] = params[:firstname] + " " + params[:lastname]
     end
-    session[:type] = "rigestered"
+    session[:type] = "registered"
     redirect('/result')
 end
 
@@ -47,8 +62,9 @@ get ('/result') do
     slim:result
 end
 
+=begin
 post('/profile')
 
 end
-
+=end
 
