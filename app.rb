@@ -13,17 +13,40 @@ def connect_to_db(path)
     return db
 end
 
-def register_user()
+def register_user(username, password, password_confirmation)
+    result =
+    if result.empty?
+        if password == password_confirmation
+            password_digest = BCrypt::Password.create(password)
 
 end
 
-def login_user(firstname, lastname)
-    if firstname == "" || lastname == ""
-        session[:name] = nil
+def login_user(username, password, password_confirmation)
+    result = db.execute("SELECT UserId FROM Users WHERE Username=?", username)
+    if result.empty?
+        if password == password_confirmation
+            password_digest = BCrypt::Password.create(password)
+            p password_digest
+            db.execute("INSERT INTO Users(Username, Password_digest) VALUES (?, ?)", [username, password_digest])
+            redirect()
+        else
+            set_error("Passwords don't match.")
+            redirect('/error')
+        end
     else
-        session[:name] = firstname + " " + lastname
+        set_error("Username already exists.")
+        redirect('/error')
     end
-    return session[:name]
+    if BCrypt::Password.new(Password_digest) == password
+        session[:UserId] = UserId
+    else
+        set_error("Invalid credentials.")
+        redirect('/error')
+    end 
+end
+
+get ('/error')
+
 end
 
 =begin
@@ -40,26 +63,35 @@ get ('/login') do
     slim:forms
 end
 
+
+#flash[:alert] = "A card was successfully added to your profile"
+#flash[:alert] = "A card was successfully added to your basket"
+
 post ('/loggedin') do
-    firstname = params[:firstname]
-    lastname = params[:lastname]
-    login_user(firstname, lastname)
+    username = params[:username]
+    password = params[:password]
+    password_confirmation = params[:password_confirmation]
+    login_user(username, password, password_confirmation)
     session[:type] = "logged in"
     redirect('/result') 
 end
 
 post ('/registered') do
-    if params[:firstname] == "" || params[:lastname] == ""
-        session[:name] = nil
-    else
-        session[:name] = params[:firstname] + " " + params[:lastname]
-    end
+    username = params[:username]
+    password = params[:password]
+    password_confirmation = params[:password_confirmation]
+    register_user(username, password, password_confirmation)
     session[:type] = "registered"
     redirect('/result')
 end
 
 get ('/result') do
     slim:result
+end
+
+get ('/profile')
+    db = connect_to_db("db/cardshop.db")
+    result = db.execute()
 end
 
 =begin
