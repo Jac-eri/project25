@@ -18,6 +18,8 @@ def register_user(username, password, password_confirmation)
     if result.empty?
         if password == password_confirmation
             password_digest = BCrypt::Password.create(password)
+        end
+    end
 
 end
 
