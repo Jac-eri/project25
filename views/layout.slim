@@ -9,7 +9,7 @@ html lang="en"
             h1.title Pokemonkort sida #151
             h2 = "Welcome #{session[:name]}!"
             <a href = "/start">Start</a> <a href = "/browse">Browse</a>
-            -if session[:type] == "logged in" ||   session[:type] == "registered"
+            -if session[:type] == "logged in" || session[:type] == "registered"
                 <a href = "/profile"> "PROFILE" </a>
             -else
                 <a href = "/login"> "LOG IN" </a>
