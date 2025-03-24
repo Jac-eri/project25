@@ -13,8 +13,8 @@ def connect_to_db(path)
     return db
 end
 
-def register_user(username, password, password_confirmation)
-    result =
+def register_user(username, password, password_confirmation, db)
+    result = db.execute("SELECT UserId FROM Users WHERE Username=?", username)
     if result.empty?
         if password == password_confirmation
             password_digest = BCrypt::Password.create(password)
@@ -32,16 +32,18 @@ def register_user(username, password, password_confirmation)
         set_error("Invalid credentials.")
         redirect('/error')
     end 
+    session[:name] = username
     session[:UserId] = UserId
 end
 
-def login_user(username, password, password_confirmation)
+def login_user(username, password, password_confirmation, db)
     result = db.execute("SELECT UserId FROM Users WHERE Username=?", username)
     if password != password_confirmation  
         set_error("Passwords don't match.")
         redirect('/error')
     end
     if BCrypt::Password.new(Password_digest) == password
+        session[:name] = username
         session[:UserId] = UserId
     else
         set_error("Invalid credentials.")
@@ -77,8 +79,10 @@ post ('/loggedin') do
     username = params[:username]
     password = params[:password]
     password_confirmation = params[:password_confirmation]
-    login_user(username, password, password_confirmation)
+    db = connect_to_db("db/cardshop.db")
+    login_user(username, password, password_confirmation, db)
     session[:type] = "logged in"
+    session[:profile_picture] = db.execute("SELECT Profile_picture FROM Users WHERE UserId=?", session[:UserId])
     redirect('/result') 
 end
 
@@ -86,8 +90,10 @@ post ('/registered') do
     username = params[:username]
     password = params[:password]
     password_confirmation = params[:password_confirmation]
-    register_user(username, password, password_confirmation)
+    db = connect_to_db("db/cardshop.db")
+    register_user(username, password, password_confirmation, db)
     session[:type] = "logged in"
+    session[:profile_picture] = db.execute("SELECT Profile_picture FROM Users WHERE UserId=?", session[:UserId])
     redirect('/result')
 end
 
@@ -96,8 +102,7 @@ get ('/result') do
 end
 
 get ('/profile') do
-    db = connect_to_db("db/cardshop.db")
-    result = db.execute()
+    
 end
 
 =begin
