@@ -33,7 +33,7 @@ def register_user(username, password, password_confirmation, db)
         redirect('/error')
     end 
     session[:name] = username
-    session[:UserId] = UserId
+    session[:UserId] = result
 end
 
 def login_user(username, password, password_confirmation, db)
@@ -44,7 +44,7 @@ def login_user(username, password, password_confirmation, db)
     end
     if BCrypt::Password.new(Password_digest) == password
         session[:name] = username
-        session[:UserId] = UserId
+        session[:UserId] = result
     else
         set_error("Invalid credentials.")
         redirect('/error')
@@ -79,7 +79,7 @@ post ('/loggedin') do
     username = params[:username]
     password = params[:password]
     password_confirmation = params[:password_confirmation]
-    db = connect_to_db("db/cardshop.db")
+    db = connect_to_db("db/Cardshop.db")
     login_user(username, password, password_confirmation, db)
     session[:type] = "logged in"
     session[:profile_picture] = db.execute("SELECT Profile_picture FROM Users WHERE UserId=?", session[:UserId])
@@ -90,7 +90,7 @@ post ('/registered') do
     username = params[:username]
     password = params[:password]
     password_confirmation = params[:password_confirmation]
-    db = connect_to_db("db/cardshop.db")
+    db = connect_to_db("db/Cardshop.db")
     register_user(username, password, password_confirmation, db)
     session[:type] = "logged in"
     session[:profile_picture] = db.execute("SELECT Profile_picture FROM Users WHERE UserId=?", session[:UserId])
