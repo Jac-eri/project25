@@ -13,6 +13,8 @@ def connect_to_db(path)
     return db
 end
 
+db = connect_to_db("db/Cardshop.db")
+
 def register_user(username, password, password_confirmation, db)
     result = db.execute("SELECT UserId FROM Users WHERE Username=?", username)
     if result.empty?
@@ -91,6 +93,7 @@ post ('/registered') do
     password = params[:password]
     password_confirmation = params[:password_confirmation]
     db = connect_to_db("db/Cardshop.db")
+    p db
     register_user(username, password, password_confirmation, db)
     session[:type] = "logged in"
     session[:profile_picture] = db.execute("SELECT Profile_picture FROM Users WHERE UserId=?", session[:UserId])
