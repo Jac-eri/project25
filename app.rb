@@ -38,29 +38,18 @@ end
 def login_user(username, password, password_confirmation, db)
     result = db.execute("SELECT UserId FROM Users WHERE Username=?", username)
     password_digest = db.execute("SELECT Password_digest FROM Users WHERE Username=?", username)
+    p password_digest
     if password != password_confirmation  
         set_error("Passwords don't match.")
         redirect('/error')
     end
-    if password == BCrypt::Password.new(password_digest) 
+    if BCrypt::Password.new(password_digest) == password
         session[:name] = username
         session[:UserId] = result
     else
         raise "Incorrect password"
     end 
 end
-
-=begin
-get ('/error')
-
-end
-=end
-
-=begin
-post('/cards')
-
-end
-=end
 
 get ('/start') do
     slim:start
@@ -86,7 +75,6 @@ post ('/registered') do
     password = params[:password]
     password_confirmation = params[:password_confirmation]
     db = connect_to_db("db/Cardshop.db")
-    p db
     register_user(username, password, password_confirmation, db)
     session[:type] = "logged in"
     session[:profile_picture] = db.execute("SELECT Profile_picture FROM Users WHERE UserId=?", session[:UserId])
