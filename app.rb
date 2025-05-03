@@ -21,14 +21,11 @@ def register_user(username, password, password_confirmation, db)
         if password == password_confirmation
             password_digest = BCrypt::Password.create(password)
             db.execute("INSERT INTO Users(Username, Password_digest) VALUES (?, ?)", [username, password_digest])
-            redirect()
         else
-            set_error("Passwords don't match.")
-            redirect('/error') 
+            raise "Wrong params"
         end
     else 
-        set_error("Username already exists.")
-        redirect('/error')
+        raise "Username already exist"
     end
     if username == nil || password == nil || password_confirmation == nil
         set_error("Invalid credentials.")
@@ -40,16 +37,16 @@ end
 
 def login_user(username, password, password_confirmation, db)
     result = db.execute("SELECT UserId FROM Users WHERE Username=?", username)
+    password_digest = db.execute("SELECT Password_digest FROM Users WHERE Username=?", username)
     if password != password_confirmation  
         set_error("Passwords don't match.")
         redirect('/error')
     end
-    if BCrypt::Password.new(Password_digest) == password
+    if password == BCrypt::Password.new(password_digest) 
         session[:name] = username
         session[:UserId] = result
     else
-        set_error("Invalid credentials.")
-        redirect('/error')
+        raise "Incorrect password"
     end 
 end
 
@@ -72,10 +69,6 @@ end
 get ('/login') do
     slim:forms
 end
-
-
-#flash[:alert] = "A card was successfully added to your profile"
-#flash[:alert] = "A card was successfully added to your basket"
 
 post ('/loggedin') do
     username = params[:username]
