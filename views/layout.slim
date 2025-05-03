@@ -13,7 +13,7 @@ html lang="en"
                 <a href = "/profile"> "PROFILE" </a>
             -else
                 <a href = "/login"> "LOG IN" </a>
-            <a href = "/profile"><img src = session[:profile_picture]></a>
+            <a href = "/profile"><img src = "/public/img/#{session[:profile_picture]}"></a>
             section.line
     section.content
         == yield

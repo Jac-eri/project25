@@ -2,8 +2,8 @@ h1 Username
 
 -@data.each do |hash|
     section style="background-image: url('#{hash["avatar"]}'); background-repeat; repeat; background-size: auto"
-        p CardId: #{hash["CardId"]}
-        p Name: #{hash["Name"]}
-        p Grade: #{hash["Grade"]}
-        p Rating: #{hash["Rating"]}
-        p Status: #{hash["Status"]}
+        p CardId: #{hash[:CardId]}
+        p Name: #{hash[:Name]}
+        p Grade: #{hash[:Grade]}
+        p Rating: #{hash[:Rating]}
+        p Status: #{hash[:Status]}

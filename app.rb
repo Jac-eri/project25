@@ -35,17 +35,12 @@ def register_user(username, password, password_confirmation, db)
     session[:UserId] = result
 end
 
-def login_user(username, password, password_confirmation, db)
-    result = db.execute("SELECT UserId FROM Users WHERE Username=?", username)
-    password_digest = db.execute("SELECT Password_digest FROM Users WHERE Username=?", username)
-    p password_digest
-    if password != password_confirmation  
-        set_error("Passwords don't match.")
-        redirect('/error')
-    end
+def login_user(username, password, db)
+    result = db.execute("SELECT * FROM Users WHERE Username=?", username).first
+    password_digest = result["Password_digest"]
     if BCrypt::Password.new(password_digest) == password
         session[:name] = username
-        session[:UserId] = result
+        session[:UserId] = result["UserId"]
     else
         raise "Incorrect password"
     end 
@@ -59,14 +54,24 @@ get ('/login') do
     slim:forms
 end
 
+get ('/browse') do
+    db = connect_to_db("db/Cardshop.db")
+    result = db.execute("SELECT * FROM Card")
+    @data = result
+    slim :browse
+end
+
 post ('/loggedin') do
     username = params[:username]
     password = params[:password]
-    password_confirmation = params[:password_confirmation]
     db = connect_to_db("db/Cardshop.db")
-    login_user(username, password, password_confirmation, db)
+    login_user(username, password, db)
     session[:type] = "logged in"
-    session[:profile_picture] = db.execute("SELECT Profile_picture FROM Users WHERE UserId=?", session[:UserId])
+    result = db.execute("SELECT * FROM Users WHERE UserId=?", session[:UserId]).first
+    pfp = result["Profile_picture"]
+    if pfp != nil
+        session[:profile_picture] = pfp
+    end
     redirect('/result') 
 end
 
@@ -77,7 +82,11 @@ post ('/registered') do
     db = connect_to_db("db/Cardshop.db")
     register_user(username, password, password_confirmation, db)
     session[:type] = "logged in"
-    session[:profile_picture] = db.execute("SELECT Profile_picture FROM Users WHERE UserId=?", session[:UserId])
+    result = db.execute("SELECT * FROM Users WHERE UserId=?", session[:UserId]).first
+    pfp = result["Profile_picture"]
+    if pfp != nil
+        session[:profile_picture] = pfp
+    end
     redirect('/result')
 end
 
