@@ -16,8 +16,8 @@ end
 db = connect_to_db("db/Cardshop.db")
 
 def register_user(username, password, password_confirmation, db)
-    result = db.execute("SELECT UserId FROM Users WHERE Username=?", username)
-    if result.empty?
+    result = db.execute("SELECT UserId FROM Users WHERE Username=?", username).first
+    if result == nil
         if password == password_confirmation
             password_digest = BCrypt::Password.create(password)
             db.execute("INSERT INTO Users(Username, Password_digest) VALUES (?, ?)", [username, password_digest])
@@ -32,7 +32,8 @@ def register_user(username, password, password_confirmation, db)
         redirect('/error')
     end 
     session[:name] = username
-    session[:UserId] = result
+    result2 = db.execute("SELECT * FROM Users WHERE Username=?", username).first
+    session[:UserId] = result2["UserId"]
 end
 
 def login_user(username, password, db)
@@ -103,4 +104,3 @@ post('/profile')
 
 end
 =end
-
